@@ -54,13 +54,13 @@ fun SearchPackageScreen() {
             modifier = Modifier
                 .background(Color(0xFF006400))
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(60.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.td_logo),
                 contentDescription = "Logo de la empresa",
-                modifier = Modifier.height(30.dp)
+                modifier = Modifier.height(40.dp)
             )
         }
 
@@ -69,7 +69,7 @@ fun SearchPackageScreen() {
         // Mensaje principal de bienvenida
         Text(
             text = "Bienvenido",
-            fontSize = 28.sp,
+            fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
         )
@@ -100,9 +100,9 @@ fun SearchPackageScreen() {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .padding(2.dp),
-                placeholder = { Text("Codigo", fontSize = 14.sp, lineHeight = 15.sp) },
-                textStyle = TextStyle(color = Color.Black, fontSize = 14.sp, lineHeight = 15.sp),
+                    .padding(0.dp),
+                placeholder = { Text("Codigo", fontSize = 16.sp, lineHeight = 18.sp) },
+                textStyle = TextStyle(color = Color.Black, fontSize = 16.sp, lineHeight = 18.sp),
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
@@ -127,7 +127,7 @@ fun SearchPackageScreen() {
         if (isSearching) {
             CircularProgressIndicator(
                 color = Color(0xFF006400),
-                modifier = Modifier.size(160.dp)
+                modifier = Modifier.size(150.dp)
             )
         } else {
             Image(
