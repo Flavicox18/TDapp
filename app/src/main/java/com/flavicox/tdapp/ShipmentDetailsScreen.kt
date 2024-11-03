@@ -78,19 +78,23 @@ fun ShipmentDetailsScreen() {
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
                         Text(
                             text = "Estado:",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "En tránsito",
                             fontSize = 14.sp,
                             color = Color.Black
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Icon(
                             painter = painterResource(id = R.drawable.shipping), // Cambia a tu ícono real
                             contentDescription = "Ícono de estado",
