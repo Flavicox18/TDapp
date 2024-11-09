@@ -3,6 +3,7 @@ package com.flavicox.tdapp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchPackageScreen(navController: NavController) {
@@ -35,9 +39,12 @@ fun SearchPackageScreen(navController: NavController) {
         }
     }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .background(Color(0xFFE0E0E0)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -94,7 +101,7 @@ fun SearchPackageScreen(navController: NavController) {
                     .weight(1f)
                     .fillMaxHeight()
                     .padding(2.dp),
-                placeholder = { Text("Codigo", fontSize = 14.sp, lineHeight = 15.sp) },
+                placeholder = { Text("Código", fontSize = 12.sp, lineHeight = 15.sp) },
                 textStyle = TextStyle(color = Color.Black, fontSize = 14.sp, lineHeight = 15.sp),
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = Color.Transparent,
@@ -120,7 +127,7 @@ fun SearchPackageScreen(navController: NavController) {
         if (isSearching) {
             CircularProgressIndicator(
                 color = Color(0xFF006400),
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(200.dp)
             )
         } else {
             Image(
