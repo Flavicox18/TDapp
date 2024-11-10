@@ -9,8 +9,8 @@ import retrofit2.http.Path
 interface EncomiendaService {
 
     @GET("api/encomienda/listarEncomienda/{id_encomienda}")
-    fun obtenerEncomienda(@Path("id_encomienda") idEncomienda: Int): Call<Encomienda>
+    fun obtenerEncomiendaPorId(@Path("id_encomienda") id_encomienda: Int): Call<Encomienda>
 
     @GET("api/historialEncomienda/listarHistorialEncomienda/{id_encomienda}")
-    fun listarHistorial(@Path("id_encomienda") idEncomienda: Int): Call<List<HistorialEncomienda>>
+    fun listarHistorialPorEncomiendaId(@Path("id_encomienda") id_encomienda: Int): Call<List<HistorialEncomienda>>
 }
