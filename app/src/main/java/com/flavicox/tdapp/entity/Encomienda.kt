@@ -8,7 +8,7 @@ data class Encomienda(
     @SerializedName("id_encomienda")
     val id_encomienda: Int? = null,
 
-    @SerializedName("descripción")
+    @SerializedName("descripcion")
     val descripcion: String? = null,
 
     @SerializedName("ciudad_origen")

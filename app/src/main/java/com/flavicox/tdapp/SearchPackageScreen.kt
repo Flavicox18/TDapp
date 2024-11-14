@@ -45,7 +45,6 @@ fun SearchPackageScreen(navController: NavController) {
     val context = LocalContext.current
     val encomiendaService = remember { ApiClient.retrofit.create(EncomiendaService::class.java) }
     val scope = rememberCoroutineScope()
-    val scrollState = rememberScrollState()
 
     fun obtenerEncomienda(id_encomienda: Int) {
         isSearching = true
@@ -95,7 +94,7 @@ fun SearchPackageScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
+            .verticalScroll(rememberScrollState())
             .background(Color(0xFFE0E0E0)),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top

@@ -13,4 +13,7 @@ interface EncomiendaService {
 
     @GET("api/historialEncomienda/listarHistorialEncomienda/{id_encomienda}")
     fun listarHistorialPorEncomiendaId(@Path("id_encomienda") id_encomienda: Int): Call<List<HistorialEncomienda>>
+
+    @GET("api/historialEncomienda/obtenerUltimoHistorial/{id_encomienda}")
+    fun obtenerUltimoHistorial(@Path("id_encomienda") id_encomienda: Int): Call<HistorialEncomienda>
 }

@@ -2,12 +2,17 @@
 
 package com.flavicox.tdapp
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,15 +21,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.flavicox.tdapp.entity.Encomienda
+import com.flavicox.tdapp.entity.HistorialEncomienda
 import com.flavicox.tdapp.service.EncomiendaService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ShipmentDetailsScreen(id_encomienda: Int) {
     val context = LocalContext.current
@@ -32,6 +44,8 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
     var encomienda by remember { mutableStateOf<Encomienda?>(null) }
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
+    var ultimoEvento by remember { mutableStateOf<HistorialEncomienda?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Función para obtener detalles de la encomienda
     fun obtenerDetallesEncomienda(id_encomienda: Int) {
@@ -57,7 +71,7 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
 
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetContent = { HistoryModalContent() },
+        sheetContent = { HistoryModalContent(id_encomienda) },
         sheetPeekHeight = 0.dp,
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
@@ -65,7 +79,8 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFE0E0E0)),
+                    .background(Color(0xFFE0E0E0))
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -110,9 +125,21 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
                         }
 
                         Box(
-                            modifier = Modifier
-                                .background(Color(0xFFFFF9C4), shape = RoundedCornerShape(8.dp))
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            modifier = if(encomienda!!.estado == "Pendiente"){
+                                Modifier
+                                    .background(color = Color(0xFFF8BABB), shape = RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                            } else {
+                                if(encomienda!!.estado == "Entregado"){
+                                    Modifier
+                                        .background(color = Color(0xFFD7F8BA), shape = RoundedCornerShape(8.dp))
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                } else {
+                                    Modifier
+                                        .background(Color(0xFFFFF9C4), shape = RoundedCornerShape(8.dp))
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                }
+                            },
                             contentAlignment = Alignment.Center
                         ) {
                             Row(
@@ -143,18 +170,44 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
                             .background(Color(0xFF006400), shape = RoundedCornerShape(8.dp))
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Column {
+                        Column (horizontalAlignment = Alignment.CenterHorizontally){
+                            scope.launch(Dispatchers.IO) {
+                                try {
+                                    val response = encomiendaService.obtenerUltimoHistorial(id_encomienda).execute()
+
+                                    withContext(Dispatchers.Main){
+                                        if (response.isSuccessful && response.body() != null){
+                                            ultimoEvento = response.body()!!
+                                        } else {
+                                            errorMessage = if (response.code() == 404) "Encomienda no encontrada" else "Error del servidor: ${response.code()}"
+                                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        errorMessage = when (e) {
+                                            is SocketTimeoutException -> "Tiempo de espera agotado"
+                                            is UnknownHostException -> "No se puede conectar al servidor. Verifica tu conexión."
+                                            else -> "Error de conexión: ${e.localizedMessage}"
+                                        }
+                                        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
                             Text(
                                 text = "Ubicación Actual:",
                                 fontSize = 16.sp,
                                 color = Color.White
                             )
-                            Text(
-                                text = "Camino a la entrega",
-                                fontSize = 16.sp,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
+                            ultimoEvento?.lugar_actual?.let { it1 ->
+                                Text(
+                                    text = it1,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 16.sp,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
 
@@ -224,8 +277,13 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun HistoryModalContent() {
+fun HistoryModalContent(id: Int) {
+    val encomiendaService = ApiClient.retrofit.create(EncomiendaService::class.java)
+    var historialEncomienda by remember { mutableStateOf<List<HistorialEncomienda>>(listOf()) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,17 +312,43 @@ fun HistoryModalContent() {
                 .padding(16.dp)
         ) {
             // Lista de eventos del historial
-            HistoryEvent("La encomienda fue entregada.", "2 de Noviembre 2024", isCurrent = true)
-            HistoryEvent("La encomienda salió a reparto", "2 de Noviembre 2024")
-            HistoryEvent("La encomienda llegó a Trujillo", "2 de Noviembre 2024")
-            HistoryEvent("Salió con destino Trujillo", "2 de Noviembre 2024")
-            HistoryEvent("La encomienda llegó a Lima", "2 de Noviembre 2024")
+            val scope = rememberCoroutineScope()
+            scope.launch(Dispatchers.IO){
+                try{
+                    val response = encomiendaService.listarHistorialPorEncomiendaId(id).execute()
+
+                    withContext(Dispatchers.Main) {
+                        if(response.isSuccessful && response.body() != null) {
+                            historialEncomienda = response.body()!!
+                        }
+                    }
+                } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                errorMessage = when (e) {
+                    is SocketTimeoutException -> "Tiempo de espera agotado"
+                    is UnknownHostException -> "No se puede conectar al servidor. Verifica tu conexión."
+                    else -> "Error de conexión: ${e.localizedMessage}"
+                }
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            }
+        }
+            }
+            LazyColumn {
+                items(historialEncomienda){ evento ->
+                    if(evento == historialEncomienda.first()){
+                        HistoryEvent(evento, isCurrent = true)
+                    }
+                    else{
+                        HistoryEvent(evento)
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun HistoryEvent(description: String, date: String, isCurrent: Boolean = false) {
+fun HistoryEvent(historialEncomienda: HistorialEncomienda, isCurrent: Boolean = false) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 4.dp)
@@ -277,8 +361,8 @@ fun HistoryEvent(description: String, date: String, isCurrent: Boolean = false) 
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
-            Text(text = description, color = if (isCurrent) Color.Black else Color.Gray)
-            Text(text = date, fontSize = 12.sp, color = Color.LightGray)
+            historialEncomienda.descripcion_evento?.let { Text(text = it, color = if (isCurrent) Color.Black else Color.Gray) }
+            historialEncomienda.fecha_evento?.let { Text(text = it.toString(), fontSize = 12.sp, color = Color.LightGray) }
         }
     }
 }
