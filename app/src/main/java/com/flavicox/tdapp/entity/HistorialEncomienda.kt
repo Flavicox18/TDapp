@@ -8,7 +8,7 @@ data class HistorialEncomienda(
     val id_historial_encomienda: Int? = null,
 
     @SerializedName("fecha_evento")
-    val fecha_evento: Date? = null,
+    val fecha_evento: String? = null,
 
     @SerializedName("tipo_evento")
     val tipo_evento: String? = null,

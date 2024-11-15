@@ -25,9 +25,9 @@ data class Encomienda(
     val estado: String? = null,
 
     @SerializedName("fecha_envio")
-    val fecha_envio: Date? = null,
+    val fecha_envio: String? = null,
     @SerializedName("fecha_entrega")
-    val fecha_entrega: Date? = null,
+    val fecha_entrega: String? = null,
 
     @SerializedName("nombre_emisor")
     val nombre_emisor: String? = null,

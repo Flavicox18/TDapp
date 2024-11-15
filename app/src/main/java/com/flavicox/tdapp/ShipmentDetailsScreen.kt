@@ -225,16 +225,26 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
                             Text(it.descripcion ?: "Descripción no disponible")
 
                             Spacer(modifier = Modifier.height(8.dp))
-
                             Text("Remitente:", fontWeight = FontWeight.Bold)
-                            Text("${it.nombre_emisor ?: "Nombre no disponible"} ${it.apellido_emisor ?: ""}")
-                            Text("DNI: ${it.dni_emisor ?: "DNI no disponible"}")
+                            if(it.nombre_emisor != null && it.apellido_emisor != null){
+                                Text("${it.nombre_emisor ?: "Nombre no disponible"} ${it.apellido_emisor ?: ""}")
+                                Text("DNI: ${it.dni_emisor ?: "DNI no disponible"}")
+                            } else{
+                                Text(it.razon_social_emisor ?: "Razón social no disponible")
+                                Text("RUC: ${it.ruc_emisor ?: "RUC no disponible"}")
+                            }
+
 
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text("Destinatario:", fontWeight = FontWeight.Bold)
-                            Text("${it.nombre_receptor ?: "Nombre no disponible"} ${it.apellido_receptor ?: ""}")
-                            Text("DNI: ${it.dni_receptor ?: "DNI no disponible"}")
+                            if(it.nombre_receptor != null && it.apellido_receptor != null){
+                                Text("${it.nombre_receptor ?: "Nombre no disponible"} ${it.apellido_receptor ?: ""}")
+                                Text("DNI: ${it.dni_receptor ?: "DNI no disponible"}")
+                            } else{
+                                Text(it.razon_social_receptor ?: "Razón social no disponible")
+                                Text("RUC: ${it.ruc_receptor ?: "RUC no disponible"}")
+                            }
 
                             Spacer(modifier = Modifier.height(8.dp))
 
