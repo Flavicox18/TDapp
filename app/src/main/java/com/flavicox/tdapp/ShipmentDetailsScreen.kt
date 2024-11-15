@@ -199,7 +199,7 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
                                 fontSize = 16.sp,
                                 color = Color.White
                             )
-                            ultimoEvento?.lugar_actual?.let { it1 ->
+                            (ultimoEvento?.lugar_actual ?: it.ciudad_origen)?.let { it1 ->
                                 Text(
                                     text = it1,
                                     textAlign = TextAlign.Center,
