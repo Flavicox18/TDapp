@@ -226,24 +226,24 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
 
                             Spacer(modifier = Modifier.height(8.dp))
                             Text("Remitente:", fontWeight = FontWeight.Bold)
-                            if(it.nombre_emisor != null && it.apellido_emisor != null){
-                                Text("${it.nombre_emisor ?: "Nombre no disponible"} ${it.apellido_emisor ?: ""}")
-                                Text("DNI: ${it.dni_emisor ?: "DNI no disponible"}")
+                            if(it.nombre_emisor != null && it.apellido_emisor != null && it.dni_emisor != null){
+                                Text("${it.nombre_emisor} ${it.apellido_emisor}")
+                                Text("DNI: ${it.dni_emisor}")
                             } else{
-                                Text(it.razon_social_emisor ?: "Razón social no disponible")
-                                Text("RUC: ${it.ruc_emisor ?: "RUC no disponible"}")
+                                Text(it.razon_social_emisor ?: "Emisor no disponible")
+                                Text("RUC: ${it.ruc_emisor ?: "Identificación no disponible"}")
                             }
 
 
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text("Destinatario:", fontWeight = FontWeight.Bold)
-                            if(it.nombre_receptor != null && it.apellido_receptor != null){
-                                Text("${it.nombre_receptor ?: "Nombre no disponible"} ${it.apellido_receptor ?: ""}")
-                                Text("DNI: ${it.dni_receptor ?: "DNI no disponible"}")
+                            if(it.nombre_receptor != null && it.apellido_receptor != null && it.dni_receptor != null){
+                                Text("${it.nombre_receptor} ${it.apellido_receptor}")
+                                Text("DNI: ${it.dni_receptor}")
                             } else{
-                                Text(it.razon_social_receptor ?: "Razón social no disponible")
-                                Text("RUC: ${it.ruc_receptor ?: "RUC no disponible"}")
+                                Text(it.razon_social_receptor ?: "Receptor no disponible")
+                                Text("RUC: ${it.ruc_receptor ?: "Identificación no disponible"}")
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -259,12 +259,12 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text("Fecha de Envío:", fontWeight = FontWeight.Bold)
-                            Text(it.fecha_envio?.toString() ?: "Fecha de envío no disponible")
+                            Text(it.fecha_envio ?: "Fecha de envío no disponible")
 
                             Spacer(modifier = Modifier.height(8.dp))
 
                             Text("Fecha Entrega:", fontWeight = FontWeight.Bold)
-                            Text(it.fecha_entrega?.toString() ?: "Fecha de entrega no disponible")
+                            Text(it.fecha_entrega ?: "Fecha de entrega no disponible")
                         }
                     }
 
@@ -275,7 +275,8 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
                         onClick = {
                             scope.launch { scaffoldState.bottomSheetState.expand() }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006400))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF006400)),
+                        enabled = it.estado != "Pendiente"
                     ) {
                         Text(text = "Ver Historial", color = Color.White)
                     }
@@ -372,7 +373,7 @@ fun HistoryEvent(historialEncomienda: HistorialEncomienda, isCurrent: Boolean = 
         Spacer(modifier = Modifier.width(8.dp))
         Column {
             historialEncomienda.descripcion_evento?.let { Text(text = it, color = if (isCurrent) Color.Black else Color.Gray) }
-            historialEncomienda.fecha_evento?.let { Text(text = it.toString(), fontSize = 12.sp, color = Color.LightGray) }
+            historialEncomienda.fecha_evento?.let { Text(text = it, fontSize = 12.sp, color = Color.LightGray) }
         }
     }
 }
