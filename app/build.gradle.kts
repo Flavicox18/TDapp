@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -77,4 +79,26 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // HILT
+
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("com.google.dagger:hilt-android:2.52")
+    kapt("com.google.dagger:hilt-android-compiler:2.52")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.52")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:2.52")
+    testImplementation("com.google.dagger:hilt-android-testing:2.52")
+    kaptTest("com.google.dagger:hilt-compiler:2.52")
+
+    // COIL
+
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+}
+
+kapt {
+    correctErrorTypes = true
 }
