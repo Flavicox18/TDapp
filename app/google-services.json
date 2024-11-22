@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "868642801579",
+    "project_id": "ventasmobile-9c5b4",
+    "storage_bucket": "ventasmobile-9c5b4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:868642801579:android:33dc1aee0aca23f4c674ee",
+        "android_client_info": {
+          "package_name": "com.flavicox.tdapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiunS246zcdDCNOC91sa5rqGD8wXt-NFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
