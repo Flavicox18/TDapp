@@ -50,40 +50,6 @@ fun SearchPackageScreen(navController: NavController) {
     val encomiendaService = remember { ApiClient.retrofit.create(EncomiendaService::class.java) }
     val scope = rememberCoroutineScope()
 
-    val speechRecognizerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-        onResult = { result ->
-            if (result.resultCode == android.app.Activity.RESULT_OK) {
-                val spokenText = result.data
-                    ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    ?.firstOrNull()
-                    ?: ""
-                query = processNumbers(spokenText) // Procesa los números hablados
-            } else {
-                Toast.makeText(context, "No se capturó voz", Toast.LENGTH_SHORT).show()
-            }
-        }
-    )
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            // Si el permiso es concedido, abre la interfaz de grabación de voz
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(
-                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                )
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-ES")
-                putExtra(RecognizerIntent.EXTRA_PROMPT, "Habla ahora")
-            }
-            speechRecognizerLauncher.launch(intent)
-        } else {
-            Toast.makeText(context, "Permiso de audio denegado", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     fun obtenerEncomienda(id_encomienda: Int) {
         isSearching = true
         errorMessage = null
@@ -126,6 +92,42 @@ fun SearchPackageScreen(navController: NavController) {
                     Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
                 }
             }
+        }
+    }
+
+    val speechRecognizerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                val spokenText = result.data
+                    ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    ?.firstOrNull()
+                    ?: ""
+                query = processNumbers(spokenText) // Procesa los números hablados
+                // Enviar busqueda
+                obtenerEncomienda(query.toInt())
+            } else {
+                Toast.makeText(context, "No se capturó voz", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            // Si el permiso es concedido, abre la interfaz de grabación de voz
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(
+                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                )
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-ES")
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "Habla ahora")
+            }
+            speechRecognizerLauncher.launch(intent)
+        } else {
+            Toast.makeText(context, "Permiso de audio denegado", Toast.LENGTH_SHORT).show()
         }
     }
 

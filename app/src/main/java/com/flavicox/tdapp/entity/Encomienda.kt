@@ -49,6 +49,8 @@ data class Encomienda(
     val razon_social_receptor: String? = null,
     @SerializedName("ruc_receptor")
     val ruc_receptor: Long? = null,
+    @SerializedName("url")
+    val url: String? = null,
 
     val historiales: List<HistorialEncomienda>? = null
 )

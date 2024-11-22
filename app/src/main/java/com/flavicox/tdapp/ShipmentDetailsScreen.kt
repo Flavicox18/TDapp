@@ -18,15 +18,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.flavicox.tdapp.entity.Encomienda
 import com.flavicox.tdapp.entity.HistorialEncomienda
 import com.flavicox.tdapp.service.EncomiendaService
+import com.flavicox.tdapp.viewmodel.ImageViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,6 +40,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import com.flavicox.tdapp.entity.Response.Loading
+import com.flavicox.tdapp.entity.Response.Success
+import com.flavicox.tdapp.entity.Response.Failure
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -265,6 +273,16 @@ fun ShipmentDetailsScreen(id_encomienda: Int) {
 
                             Text("Fecha Entrega:", fontWeight = FontWeight.Bold)
                             Text(it.fecha_entrega ?: "Fecha de entrega no disponible")
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text("Imagen de Encomienda:", fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            if(it.url != null){
+                                ImageContent(it.url)
+                            } else{
+                                Text("Imagen no disponible")
+                            }
                         }
                     }
 
@@ -375,5 +393,25 @@ fun HistoryEvent(historialEncomienda: HistorialEncomienda, isCurrent: Boolean = 
             historialEncomienda.descripcion_evento?.let { Text(text = it, color = if (isCurrent) Color.Black else Color.Gray) }
             historialEncomienda.fecha_evento?.let { Text(text = it, fontSize = 12.sp, color = Color.LightGray) }
         }
+    }
+}
+
+@Composable
+fun ImageContent(
+    imageUrl: String
+){
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ){
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build()
+            , contentDescription = "Foto de la encomienda",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
