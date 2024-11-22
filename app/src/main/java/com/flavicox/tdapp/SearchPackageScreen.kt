@@ -1,7 +1,11 @@
 package com.flavicox.tdapp
 
-import android.util.Log
+import android.Manifest
+import android.content.Intent
+import android.speech.RecognizerIntent
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -45,6 +49,40 @@ fun SearchPackageScreen(navController: NavController) {
     val context = LocalContext.current
     val encomiendaService = remember { ApiClient.retrofit.create(EncomiendaService::class.java) }
     val scope = rememberCoroutineScope()
+
+    val speechRecognizerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            if (result.resultCode == android.app.Activity.RESULT_OK) {
+                val spokenText = result.data
+                    ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    ?.firstOrNull()
+                    ?: ""
+                query = processNumbers(spokenText) // Procesa los números hablados
+            } else {
+                Toast.makeText(context, "No se capturó voz", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            // Si el permiso es concedido, abre la interfaz de grabación de voz
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(
+                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                )
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "es-ES")
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "Habla ahora")
+            }
+            speechRecognizerLauncher.launch(intent)
+        } else {
+            Toast.makeText(context, "Permiso de audio denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     fun obtenerEncomienda(id_encomienda: Int) {
         isSearching = true
@@ -169,9 +207,22 @@ fun SearchPackageScreen(navController: NavController) {
                 onClick = {
                     if (query.isNotEmpty()) obtenerEncomienda(query.toInt())
                 },
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = 10.dp)
             ) {
                 Icon(Icons.Default.Search, contentDescription = "Buscar", tint = Color(0xFF006400))
+            }
+
+            IconButton (
+                onClick = {
+                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                },
+                modifier = Modifier.padding(end = 15.dp)
+                    .size(30.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.microfono),
+                    contentDescription = "Paquete"
+                )
             }
         }
 
@@ -200,5 +251,25 @@ fun SearchPackageScreen(navController: NavController) {
                 modifier = Modifier.size(350.dp)
             )
         }
+    }
+}
+
+fun processNumbers(input: String): String {
+    val numbersMap = mapOf(
+        "cero" to "0", "uno" to "1", "dos" to "2", "tres" to "3",
+        "cuatro" to "4", "cinco" to "5", "seis" to "6", "siete" to "7",
+        "ocho" to "8", "nueve" to "9", "diez" to "10", "once" to "11",
+        "doce" to "12", "trece" to "13", "catorce" to "14", "quince" to "15",
+        "dieciséis" to "16", "diecisiete" to "17", "dieciocho" to "18", "diecinueve" to "19",
+        "veinte" to "20", "veintiuno" to "21", "veintidós" to "22", "veintitrés" to "23",
+        "veinticuatro" to "24", "veinticinco" to "25", "veintiséis" to "26", "veintisiete" to "27",
+        "veintiocho" to "28", "veintinueve" to "29", "treinta" to "30", "treinta y uno" to "31",
+        "treinta y dos" to "32", "treinta y tres" to "33", "treinta y cuatro" to "34",
+        "treinta y cinco" to "35", "treinta y seis" to "36", "treinta y siete" to "37",
+        "treinta y ocho" to "38", "treinta y nueve" to "39", "cuarenta" to "40"
+    )
+    val regex = Regex(numbersMap.keys.joinToString("|", "\\b(", ")\\b"))
+    return regex.replace(input) { matchResult ->
+        numbersMap[matchResult.value.lowercase()] ?: matchResult.value
     }
 }
