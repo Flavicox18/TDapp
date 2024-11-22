@@ -3,7 +3,6 @@
 package com.flavicox.tdapp
 
 import android.annotation.SuppressLint
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
